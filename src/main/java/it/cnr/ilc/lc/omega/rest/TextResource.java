@@ -6,6 +6,11 @@
 package it.cnr.ilc.lc.omega.rest;
 
 import it.cnr.ilc.lc.omega.core.ManagerAction;
+import it.cnr.ilc.lc.omega.core.OmegaCore;
+import it.cnr.ilc.lc.omega.core.datatype.Text;
+import it.cnr.ilc.lc.omega.exception.InvalidURIException;
+
+
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
@@ -14,8 +19,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
-import it.cnr.ilc.lc.omega.core.datatype.Text;
-import it.cnr.ilc.lc.omega.exception.InvalidURIException;
+
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +39,7 @@ public class TextResource {
      * Creates a new instance of TextResource
      */
     public TextResource() {
+         //OmegaCore.start();
     }
 
     /**
@@ -46,7 +51,7 @@ public class TextResource {
     @GET
     @Produces("text/html")
     public String getHtml() {
-        String ret = "vuota!!!!!!!!!!";
+        String ret = "vuota!!!!!!!!!!?";
         try {
             //TODO return proper representation object
             Text text = Text.of("boiadé", URI.create("java/fa/caa"));
