@@ -38,6 +38,7 @@ public class TextResource {
      * Creates a new instance of TextResource
      */
     public TextResource() {
+         //OmegaCore.start();
     }
 
     /**
@@ -48,8 +49,8 @@ public class TextResource {
      */
     @GET
     @Produces("text/html")
-    public String getHtml() {
-        String ret = "vuota!!!!!!!!!!";
+    public String getHtml() throws InvalidURIException {
+        String ret = "vuota!!!!!!!!!!?";
         try {
             //TODO return proper representation object
             /*ResourceManager manager = new ResourceManager();
