@@ -6,6 +6,7 @@
 package it.cnr.ilc.lc.omega.rest;
 
 import it.cnr.ilc.lc.omega.core.ManagerAction;
+import it.cnr.ilc.lc.omega.core.ResourceManager;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.PathParam;
@@ -19,6 +20,8 @@ import it.cnr.ilc.lc.omega.exception.InvalidURIException;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.activation.MimeType;
+import javax.activation.MimeTypeParseException;
 
 /**
  * REST Web Service
@@ -49,6 +52,13 @@ public class TextResource {
         String ret = "vuota!!!!!!!!!!";
         try {
             //TODO return proper representation object
+            /*ResourceManager manager = new ResourceManager();
+            try {
+                manager.createSource(URI.create("java/fa/caa"), new MimeType("text/plain"));
+            } catch (MimeTypeParseException ex) {
+                Logger.getLogger(TextResource.class.getName()).log(Level.SEVERE, null, ex);
+            }*/
+            
             Text text = Text.of("boiadé", URI.create("java/fa/caa"));
             ret  = text.toString();
         } catch (ManagerAction.ActionException ex) {
