@@ -62,6 +62,7 @@ public class TextResource {
             
             Text text = Text.of("boiadé", URI.create("java/fa/caa"));
             ret  = text.toString();
+            text.save();
         } catch (ManagerAction.ActionException ex) {
             Logger.getLogger(TextResource.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvalidURIException ex) {
