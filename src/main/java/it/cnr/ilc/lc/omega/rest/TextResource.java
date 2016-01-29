@@ -6,22 +6,16 @@
 package it.cnr.ilc.lc.omega.rest;
 
 import it.cnr.ilc.lc.omega.core.ManagerAction;
-import it.cnr.ilc.lc.omega.core.ResourceManager;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PUT;
 import it.cnr.ilc.lc.omega.core.datatype.Text;
 import it.cnr.ilc.lc.omega.exception.InvalidURIException;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.activation.MimeType;
-import javax.activation.MimeTypeParseException;
 
 /**
  * REST Web Service
@@ -38,7 +32,7 @@ public class TextResource {
      * Creates a new instance of TextResource
      */
     public TextResource() {
-         //OmegaCore.start();
+        //OmegaCore.start();
     }
 
     /**
@@ -48,27 +42,47 @@ public class TextResource {
      * @return an instance of java.lang.String
      */
     @GET
+    @Path("/create")
     @Produces("text/html")
-    public String getHtml() throws InvalidURIException {
+    public String setText() throws InvalidURIException {
         String ret = "vuota!!!!!!!!!!?";
         try {
             //TODO return proper representation object
             /*ResourceManager manager = new ResourceManager();
-            try {
-                manager.createSource(URI.create("java/fa/caa"), new MimeType("text/plain"));
-            } catch (MimeTypeParseException ex) {
-                Logger.getLogger(TextResource.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
-            
+             try {
+             manager.createSource(URI.create("java/fa/caa"), new MimeType("text/plain"));
+             } catch (MimeTypeParseException ex) {
+             Logger.getLogger(TextResource.class.getName()).log(Level.SEVERE, null, ex);
+             }*/
+
             Text text = Text.of("boiadé", URI.create("java/fa/caa"));
-            ret  = text.toString();
-            text.save();
+            ret = text.toString();
+            //text.save();
         } catch (ManagerAction.ActionException ex) {
             Logger.getLogger(TextResource.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvalidURIException ex) {
             Logger.getLogger(TextResource.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "<html><h1>" + ret + "</h1></html>";
+        return "<html><head><meta charset=\"utf-8\" /></head><body><h1>" + "Creata la Risorsa" + "</h1><p>"+ret+"</p></body></html>";
+    }
+
+    @GET
+    @Path("/load")
+    @Produces("text/html")
+    public String getText() throws InvalidURIException {
+        String ret = "Testo non caricato!!";
+
+        Text text = null;
+        try {
+            text = Text.load(URI.create("java/fa/caa"));
+        } catch (ManagerAction.ActionException ex) {
+            Logger.getLogger(TextResource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (text != null) {
+            ret = text.toString();
+        }
+
+        return "<html><head><meta charset=\"utf-8\" /></head><body><h1>" + "La risorsa caricata" + "</h1><p>"+ ret +"</p></body></html>";
     }
 
 }

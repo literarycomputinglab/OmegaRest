@@ -54,10 +54,10 @@ public class CoreManagerResource {
         if ("start".equals(action)) {
             System.out.println("starting methods");
             //start MicroKernel
-            OmegaCore.start();
+            //OmegaCore.start();
         } else {
             System.out.println("parameter in CoreManager " + action);
-            OmegaCore.stop();
+            //OmegaCore.stop();
             //stop MicroKernel
         }
         System.out.println("returning getHtml " + ret);
