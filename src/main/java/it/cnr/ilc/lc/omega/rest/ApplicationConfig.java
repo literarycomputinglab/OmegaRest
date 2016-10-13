@@ -23,14 +23,14 @@ public class ApplicationConfig extends Application {
     }
 
     /**
-     * Do not modify addRestResourceClasses() method.
-     * It is automatically populated with
-     * all resources defined in the project.
-     * If required, comment out calling this method in getClasses().
+     * Do not modify addRestResourceClasses() method. It is automatically
+     * populated with all resources defined in the project. If required, comment
+     * out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(it.cnr.ilc.lc.omega.rest.CoreManagerResource.class);
-        resources.add(it.cnr.ilc.lc.omega.rest.TextResource.class);
+        resources.add(it.cnr.ilc.lc.omega.rest.TextsResource.class);
+        resources.add(provider.MyJacksonJsonProvider.class);
+
     }
-    
+
 }
