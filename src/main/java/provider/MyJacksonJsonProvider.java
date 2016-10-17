@@ -36,8 +36,8 @@ public class MyJacksonJsonProvider implements ContextResolver<ObjectMapper> {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     static {
-        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-        MAPPER.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
+//        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+//        MAPPER.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
         //MAPPER.disable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
     }
 
@@ -48,6 +48,7 @@ public class MyJacksonJsonProvider implements ContextResolver<ObjectMapper> {
     @Override
     public ObjectMapper getContext(Class<?> type) {
         logger.info("MyJacksonProvider.getContext() called with type: " + type);
+        logger.info(MAPPER.getSerializationConfig());
         return MAPPER;
     }
 }

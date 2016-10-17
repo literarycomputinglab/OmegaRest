@@ -9,6 +9,7 @@ package it.cnr.ilc.lc.omega.rest;
  *
  * @author simone
  */
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.Text;
 import java.util.List;
