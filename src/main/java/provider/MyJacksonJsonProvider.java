@@ -8,10 +8,17 @@ package provider;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import it.cnr.ilc.lc.omega.persistence.PersistenceHandler;
+import javax.persistence.EntityManager;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.SessionFactory;
+import org.hibernate.jpa.HibernateEntityManager;
+import org.hibernate.jpa.HibernateEntityManagerFactory;
+import sirius.kernel.di.std.Part;
 
 /**
  *
@@ -35,13 +42,26 @@ public class MyJacksonJsonProvider implements ContextResolver<ObjectMapper> {
     private static Logger logger = LogManager.getLogger(MyJacksonJsonProvider.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    @Part
+    static PersistenceHandler persistence;
+
     static {
-//        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-//        MAPPER.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
+        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        //MAPPER.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
         //MAPPER.disable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+
     }
 
     public MyJacksonJsonProvider() {
+        Hibernate5Module h5m = new Hibernate5Module((SessionFactory) 
+                persistence.getEntityManager().getEntityManagerFactory().
+                unwrap(HibernateEntityManagerFactory.class).
+                getSessionFactory());
+        h5m.enable(Hibernate5Module.Feature.FORCE_LAZY_LOADING);
+        h5m.enable(Hibernate5Module.Feature.USE_TRANSIENT_ANNOTATION);
+        h5m.enable(Hibernate5Module.Feature.REPLACE_PERSISTENT_COLLECTIONS);
+        MAPPER.registerModule(h5m);
+
         logger.info("Instantiate MyJacksonJsonProvider");
     }
 
@@ -49,6 +69,7 @@ public class MyJacksonJsonProvider implements ContextResolver<ObjectMapper> {
     public ObjectMapper getContext(Class<?> type) {
         logger.info("MyJacksonProvider.getContext() called with type: " + type);
         logger.info(MAPPER.getSerializationConfig());
+
         return MAPPER;
     }
 }

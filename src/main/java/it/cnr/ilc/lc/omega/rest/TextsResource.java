@@ -9,14 +9,18 @@ package it.cnr.ilc.lc.omega.rest;
  *
  * @author simone
  */
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.Text;
+import it.cnr.ilc.lc.omega.entity.Annotation;
+import it.cnr.ilc.lc.omega.rest.servicemodel.AnnotationUri;
+import it.cnr.ilc.lc.omega.rest.servicemodel.TextUri;
+import java.net.URI;
 import java.util.List;
 import java.util.logging.Level;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,16 +39,44 @@ public class TextsResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Text> getAllTexts() {
-        logger.info("getAllText");
+    public List<TextUri> getAllTextRefs() {
+        logger.info("getAllTextRefs");
         try {
-            return Text.loadAll();
+
+            return TextUri.toTextUri(Text.loadAll());
         } catch (ManagerAction.ActionException ex) {
-            java.util.logging.Logger.getLogger(TextsResource.class.getName()).log(Level.SEVERE, null, ex);
+            logger.fatal(ex);
         }
         return null;
     }
 
+    @Path("text")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Text getTextByUri(@QueryParam("uri") String uri) {
+        logger.info("getTextByUri");
+        try {
+
+            return Text.load(URI.create(uri));
+        } catch (ManagerAction.ActionException ex) {
+            logger.fatal(ex);
+        }
+        return null;
+    }
+
+    @Path("annotations")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<AnnotationUri> getAnnotations() {
+
+        logger.info("getAnnotations");
+        try {
+            return AnnotationUri.toAnnotationUri(Text.loadAllAnnotations());
+        } catch (ManagerAction.ActionException ex) {
+            logger.fatal(ex);
+        }
+        return null;
+    }
 //    @POST
 //    @Consumes(MediaType.APPLICATION_JSON)
 //    public void postJson(String name) {
