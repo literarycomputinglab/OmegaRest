@@ -54,7 +54,7 @@ public class TextsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Text getTextByUri(@QueryParam("uri") String uri) {
-        logger.info("getTextByUri");
+        logger.info("getTextByUri(" + uri + ")");
         try {
 
             return Text.load(URI.create(uri));
@@ -72,6 +72,20 @@ public class TextsResource {
         logger.info("getAnnotations");
         try {
             return AnnotationUri.toAnnotationUri(Text.loadAllAnnotations());
+        } catch (ManagerAction.ActionException ex) {
+            logger.fatal(ex);
+        }
+        return null;
+    }
+
+    @Path("annotations/annotation")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Annotation getAnnotation(@QueryParam("uri") String uri) {
+
+        logger.info("getAnnotation (" + uri +")");
+        try {
+            return Text.loadAnnotation(URI.create(uri));
         } catch (ManagerAction.ActionException ex) {
             logger.fatal(ex);
         }

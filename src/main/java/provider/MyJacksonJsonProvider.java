@@ -6,17 +6,16 @@
 package provider;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import it.cnr.ilc.lc.omega.persistence.PersistenceHandler;
-import javax.persistence.EntityManager;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
-import org.hibernate.jpa.HibernateEntityManager;
 import org.hibernate.jpa.HibernateEntityManagerFactory;
 import sirius.kernel.di.std.Part;
 
@@ -46,15 +45,15 @@ public class MyJacksonJsonProvider implements ContextResolver<ObjectMapper> {
     static PersistenceHandler persistence;
 
     static {
-        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
         //MAPPER.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
         //MAPPER.disable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
     }
 
     public MyJacksonJsonProvider() {
-        Hibernate5Module h5m = new Hibernate5Module((SessionFactory) 
-                persistence.getEntityManager().getEntityManagerFactory().
+        Hibernate5Module h5m = new Hibernate5Module((SessionFactory) persistence.getEntityManager().getEntityManagerFactory().
                 unwrap(HibernateEntityManagerFactory.class).
                 getSessionFactory());
         h5m.enable(Hibernate5Module.Feature.FORCE_LAZY_LOADING);
