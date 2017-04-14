@@ -16,7 +16,6 @@ import it.cnr.ilc.lc.omega.rest.servicemodel.AnnotationUri;
 import it.cnr.ilc.lc.omega.rest.servicemodel.TextUri;
 import java.net.URI;
 import java.util.List;
-import java.util.logging.Level;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -32,7 +31,7 @@ import org.apache.logging.log4j.Logger;
 @Path("/TextsSentence")
 public class TextsResource {
 
-    private static Logger logger = LogManager.getLogger(TextsResource.class);
+    private static final Logger log = LogManager.getLogger(TextsResource.class);
 
     public TextsResource() {
     }
@@ -40,12 +39,12 @@ public class TextsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<TextUri> getAllTextRefs() {
-        logger.info("getAllTextRefs");
+        log.info("getAllTextRefs()");
         try {
 
             return TextUri.toTextUri(Text.loadAll());
         } catch (ManagerAction.ActionException ex) {
-            logger.fatal(ex);
+            log.fatal(ex);
         }
         return null;
     }
@@ -54,12 +53,12 @@ public class TextsResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Text getTextByUri(@QueryParam("uri") String uri) {
-        logger.info("getTextByUri(" + uri + ")");
+        log.info("getTextByUri(" + uri + ")");
         try {
 
             return Text.load(URI.create(uri));
         } catch (ManagerAction.ActionException ex) {
-            logger.fatal(ex);
+            log.fatal(ex);
         }
         return null;
     }
@@ -69,11 +68,11 @@ public class TextsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<AnnotationUri> getAnnotations() {
 
-        logger.info("getAnnotations");
+        log.info("getAnnotations()");
         try {
             return AnnotationUri.toAnnotationUri(Text.loadAllAnnotations());
         } catch (ManagerAction.ActionException ex) {
-            logger.fatal(ex);
+            log.fatal(ex);
         }
         return null;
     }
@@ -83,11 +82,11 @@ public class TextsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Annotation getAnnotation(@QueryParam("uri") String uri) {
 
-        logger.info("getAnnotation (" + uri +")");
+        log.info("getAnnotation (" + uri + ")");
         try {
             return Text.loadAnnotation(URI.create(uri));
         } catch (ManagerAction.ActionException ex) {
-            logger.fatal(ex);
+            log.fatal(ex);
         }
         return null;
     }
