@@ -5,6 +5,9 @@
  */
 package it.cnr.ilc.lc.omega.rest;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 
@@ -22,16 +25,27 @@ public class ApplicationConfig extends Application {
         return resources;
     }
 
-    /**
-     * Do not modify addRestResourceClasses() method. It is automatically
-     * populated with all resources defined in the project. If required, comment
-     * out calling this method in getClasses().
-     */
+
+//    @Override
+//    public Set<Object> getSingletons() {
+//        
+//        return Collections.emptySet();
+//    }
+
+//    @Override
+//    public Map<String, Object> getProperties() {
+//
+//        Map<String, Object> properties = new HashMap<>();
+//        
+//        properties.put("jersey.config.server.wadl.disableWadl", true);
+//        
+//        return properties;
+//    }
+
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(it.cnr.ilc.lc.omega.rest.TextsResource.class);
         resources.add(it.cnr.ilc.lc.omega.rest.virtualdatasystem.RepositoryResource.class);
         resources.add(provider.MyJacksonJsonProvider.class);
-
     }
-
+    
 }
