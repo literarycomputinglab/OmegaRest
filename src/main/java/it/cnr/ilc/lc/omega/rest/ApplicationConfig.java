@@ -5,9 +5,6 @@
  */
 package it.cnr.ilc.lc.omega.rest;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.Application;
 
@@ -25,13 +22,11 @@ public class ApplicationConfig extends Application {
         return resources;
     }
 
-
 //    @Override
 //    public Set<Object> getSingletons() {
 //        
 //        return Collections.emptySet();
 //    }
-
 //    @Override
 //    public Map<String, Object> getProperties() {
 //
@@ -41,11 +36,10 @@ public class ApplicationConfig extends Application {
 //        
 //        return properties;
 //    }
-
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(it.cnr.ilc.lc.omega.rest.TextsResource.class);
         resources.add(it.cnr.ilc.lc.omega.rest.virtualdatasystem.RepositoryResource.class);
         resources.add(provider.MyJacksonJsonProvider.class);
     }
-    
+
 }

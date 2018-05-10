@@ -12,15 +12,25 @@ package it.cnr.ilc.lc.omega.rest;
 import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.Text;
 import it.cnr.ilc.lc.omega.entity.Annotation;
+import it.cnr.ilc.lc.omega.exception.InvalidURIException;
 import it.cnr.ilc.lc.omega.rest.servicemodel.AnnotationUri;
+import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
+import it.cnr.ilc.lc.omega.rest.servicemodel.TextDTO;
 import it.cnr.ilc.lc.omega.rest.servicemodel.TextUri;
 import java.net.URI;
 import java.util.List;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +40,9 @@ import org.apache.logging.log4j.Logger;
  */
 @Path("/TextsSentence")
 public class TextsResource {
+
+    @Context
+    private UriInfo context;
 
     private static final Logger log = LogManager.getLogger(TextsResource.class);
 
@@ -47,6 +60,51 @@ public class TextsResource {
             log.fatal(ex);
         }
         return null;
+    }
+
+    @Path("text/create")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+//    public Response createText(@FormParam("") TextDTO text) {
+    public Response createText(TextDTO text) {
+        log.info("createText(" + text + ")");
+        Response.ResponseBuilder rb = Response.created(context.getAbsolutePath());
+        Text t = null;
+        URI uri = null;
+        
+        try {
+            
+            uri = URI.create(text.uri);
+            if (null != text.text) {
+                t = Text.of(text.text, uri);
+            } else {
+                t = Text.of(uri);
+            }
+            t.save();
+
+        } catch (NullPointerException npe) {
+            log.error("createText: " , npe);
+            rb.entity(new ServiceResult("1", "Error, " + ExceptionUtils.getRootCauseMessage(npe)));
+            return rb.build();
+
+        } catch (ManagerAction.ActionException ex) {
+            log.error("createText: " + ex.getMessage());
+            rb.entity(new ServiceResult("2", "Error, " + ex.getLocalizedMessage()));
+            return rb.build();
+
+        } catch (InvalidURIException iue) {
+            log.error("createText: " + iue.getMessage());
+            rb.entity(new ServiceResult("3", "Invalid URI, " + iue.getLocalizedMessage()));
+            return rb.build();
+
+        } catch (IllegalArgumentException iae) {
+            log.error("createText: " + iae.getMessage());
+            rb.entity(new ServiceResult("4", "Invalid URI, " + iae.getLocalizedMessage()));
+        }
+        log.info("createText: ok!");
+
+        return rb.entity(new ServiceResult()).build();
     }
 
     @Path("text")
