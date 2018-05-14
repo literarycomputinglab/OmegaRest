@@ -10,15 +10,24 @@ package it.cnr.ilc.lc.omega.rest;
  * @author simone
  */
 import it.cnr.ilc.lc.omega.adt.annotation.Work;
+import it.cnr.ilc.lc.omega.adt.annotation.dto.Authors;
+import it.cnr.ilc.lc.omega.adt.annotation.dto.DTOValue;
+import it.cnr.ilc.lc.omega.adt.annotation.dto.Loci;
+import it.cnr.ilc.lc.omega.adt.annotation.dto.PubblicationDate;
+import it.cnr.ilc.lc.omega.adt.annotation.dto.Title;
 import it.cnr.ilc.lc.omega.core.ManagerAction;
+import it.cnr.ilc.lc.omega.core.datatype.Text;
 import it.cnr.ilc.lc.omega.entity.Annotation;
+import it.cnr.ilc.lc.omega.entity.TextLocus;
 import it.cnr.ilc.lc.omega.exception.InvalidURIException;
 import it.cnr.ilc.lc.omega.rest.servicemodel.AnnotationUri;
 import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
 import it.cnr.ilc.lc.omega.rest.servicemodel.TextDTO;
+import it.cnr.ilc.lc.omega.rest.servicemodel.WorkDTO;
 import it.cnr.ilc.lc.omega.rest.servicemodel.WorkUri;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Level;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -61,27 +70,31 @@ public class WorksResource {
         return null;
     }
 
-    /*
-    @Path("text/create")
+    @Path("work/create")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
 //    public Response createText(@FormParam("") TextDTO text) {
-    public Response createText(TextDTO text) {
-        log.info("createText(" + text + ")");
+    public Response createWork(WorkDTO work) {
+        log.info("createWork(" + work + ")");
         Response.ResponseBuilder rb = Response.created(context.getAbsolutePath());
-        Work t = null;
-        URI uri = null;
+        Work w = null;
 
         try {
 
-            uri = URI.create(text.uri);
-            if (null != text.text) {
-                t = Work.of(text.text, uri);
-            } else {
-                t = Work.of(uri);
-            }
-            t.save();
+            URI textUri = URI.create(work.textUri);
+            URI workUri = URI.create(work.workUri);
+            Authors authors = work.authors;
+            PubblicationDate pd = work.pd;
+            Title title = work.title;
+
+            w = Work.of(authors, pd, title, workUri);
+
+            TextLocus tl = Work.createTextLocus(Text.load(textUri).getSource());
+            Loci loci = DTOValue.instantiate(Loci.class).withValue(tl);
+            w.addLoci(loci);
+
+            w.save();
 
         } catch (NullPointerException npe) {
             log.error("createText: ", npe);
@@ -101,12 +114,16 @@ public class WorksResource {
         } catch (IllegalArgumentException iae) {
             log.error("createText: " + iae.getMessage());
             rb.entity(new ServiceResult("4", "Invalid URI, " + iae.getLocalizedMessage()));
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(WorksResource.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(WorksResource.class.getName()).log(Level.SEVERE, null, ex);
         }
         log.info("createText: ok!");
 
         return rb.entity(new ServiceResult()).build();
     }
-
+    /*
     @Path("text")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -148,7 +165,7 @@ public class WorksResource {
         }
         return null;
     }
-*/
+     */
 //    @POST
 //    @Consumes(MediaType.APPLICATION_JSON)
 //    public void postJson(String name) {
