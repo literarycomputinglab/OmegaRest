@@ -5,18 +5,36 @@
  */
 package it.cnr.ilc.lc.omega.rest.virtualdatasystem;
 
+import it.cnr.ilc.lc.omega.adt.annotation.CatalogItem;
+import it.cnr.ilc.lc.omega.adt.annotation.Work;
+import it.cnr.ilc.lc.omega.annotation.catalog.ResourceSystemAnnotationType;
+import it.cnr.ilc.lc.omega.core.ManagerAction;
+import it.cnr.ilc.lc.omega.entity.Annotation;
 import it.cnr.ilc.lc.omega.exception.VirtualResourceSystemException;
 import it.cnr.ilc.lc.omega.resourcesystem.Collection;
 import it.cnr.ilc.lc.omega.resourcesystem.Resource;
 import it.cnr.ilc.lc.omega.resourcesystem.ResourceSystemComponent;
+import it.cnr.ilc.lc.omega.resourcesystem.dto.DTOValueRSC;
+import it.cnr.ilc.lc.omega.resourcesystem.dto.RSCParent;
+import it.cnr.ilc.lc.omega.resourcesystem.dto.RSCType;
+import it.cnr.ilc.lc.omega.rest.servicemodel.RSComponentDTO;
+import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
+import it.cnr.ilc.lc.omega.rest.servicemodel.WorkDTO;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URI;
+import java.util.logging.Level;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +46,9 @@ import org.apache.logging.log4j.Logger;
 public class RepositoryResource {
 
     private static final Logger log = LogManager.getLogger(RepositoryResource.class);
+
+    @Context
+    private UriInfo context;
 
     @GET
     @Path("root")
@@ -74,6 +95,101 @@ public class RepositoryResource {
 
     }
 
+    @Path("resource/create")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+//    public Response createText(@FormParam("") TextDTO text) {
+    public Response createResource(RSComponentDTO dto) {
+//ResourceSystemComponent firstLevel = ResourceSystemComponent.of(Resource.class, URI.create("/collection/first/001"))
+//                .withParams(firstName, firstDescription, firstType, rootParent);
+        Response.ResponseBuilder rb = Response.created(context.getAbsolutePath());
+
+        try {
+
+            Collection parentCollection = ResourceSystemComponent.load(Collection.class, dto.uriParent);
+            RSCType type = DTOValueRSC.instantiate(RSCType.class).withValue(ResourceSystemAnnotationType.RESOURCE);
+            RSCParent parent = DTOValueRSC.instantiate(RSCParent.class).withValue(parentCollection);
+
+            ResourceSystemComponent resource = ResourceSystemComponent.of(Resource.class, dto.uri)
+                    .withParams(dto.name, dto.description, type, parent);
+
+            resource.setResourceContent(load(dto.catalogItemUri));
+            parentCollection.add(resource);
+            parentCollection.save();
+
+        } catch (InstantiationException ie) {
+            log.error(ie.getLocalizedMessage());
+            rb.entity(new ServiceResult("1", "Error, " + ExceptionUtils.getRootCauseMessage(ie)));
+            return rb.build();
+        } catch (IllegalAccessException iae) {
+            log.error(iae.getLocalizedMessage());
+            rb.entity(new ServiceResult("2", "Error, " + ExceptionUtils.getRootCauseMessage(iae)));
+            return rb.build();
+        } catch (VirtualResourceSystemException vrse) {
+            log.error(vrse.getLocalizedMessage());
+            rb.entity(new ServiceResult("3", "Error, " + ExceptionUtils.getRootCauseMessage(vrse)));
+            return rb.build();
+        } catch (ManagerAction.ActionException ex) {
+            log.error(ex.getLocalizedMessage());
+            rb.entity(new ServiceResult("4", "Error, " + ExceptionUtils.getRootCauseMessage(ex)));
+            return rb.build();
+        } catch (Annotation.Data.InvocationMethodException ime) {
+            log.error(ime.getLocalizedMessage());
+            rb.entity(new ServiceResult("5", "Error, " + ExceptionUtils.getRootCauseMessage(ime)));
+            return rb.build();
+        }
+
+        log.info("resource created");
+
+        return rb.entity(new ServiceResult()).build();
+    }
+
+    @Path("collection/create")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+//    public Response createText(@FormParam("") TextDTO text) {
+    public Response createCollection(RSComponentDTO dto) {
+
+        Response.ResponseBuilder rb = Response.created(context.getAbsolutePath());
+        try {
+            Collection parentCollection = ResourceSystemComponent.load(Collection.class, dto.uriParent);
+            RSCType type = DTOValueRSC.instantiate(RSCType.class).withValue(ResourceSystemAnnotationType.COLLECTION);
+            RSCParent parent = DTOValueRSC.instantiate(RSCParent.class).withValue(parentCollection);
+            ResourceSystemComponent collection = ResourceSystemComponent.of(Collection.class, dto.uri)
+                    .withParams(dto.name, dto.description, type, parent);
+
+            parentCollection.add(collection);
+            parentCollection.save();
+
+        } catch (InstantiationException ie) {
+            log.error(ie.getLocalizedMessage());
+            rb.entity(new ServiceResult("1", "Error, " + ExceptionUtils.getRootCauseMessage(ie)));
+            return rb.build();
+        } catch (IllegalAccessException iae) {
+            log.error(iae.getLocalizedMessage());
+            rb.entity(new ServiceResult("2", "Error, " + ExceptionUtils.getRootCauseMessage(iae)));
+            return rb.build();
+        } catch (VirtualResourceSystemException vrse) {
+            log.error(vrse.getLocalizedMessage());
+            rb.entity(new ServiceResult("3", "Error, " + ExceptionUtils.getRootCauseMessage(vrse)));
+            return rb.build();
+        } catch (ManagerAction.ActionException ex) {
+            log.error(ex.getLocalizedMessage());
+            rb.entity(new ServiceResult("4", "Error, " + ExceptionUtils.getRootCauseMessage(ex)));
+            return rb.build();
+        } catch (Annotation.Data.InvocationMethodException ime) {
+            log.error(ime.getLocalizedMessage());
+            rb.entity(new ServiceResult("5", "Error, " + ExceptionUtils.getRootCauseMessage(ime)));
+            return rb.build();
+        }
+
+        log.info("collection created!");
+
+        return rb.entity(new ServiceResult()).build();
+    }
+
     private ResourceSystemComponent getRSCCollection(String aUri) throws VirtualResourceSystemException {
 
         log.info(String.format("trying to get a Collection referred by URI %s", aUri));
@@ -93,4 +209,14 @@ public class RepositoryResource {
         return rsc;
     }
 
+    private CatalogItem load (URI catalogItemUri){
+        
+        try {
+            return Work.load(catalogItemUri);
+        } catch (ManagerAction.ActionException ex) {
+            log.error(ex);
+        }
+        return null;
+    }
+    
 }
