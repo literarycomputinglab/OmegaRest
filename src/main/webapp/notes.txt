@@ -1,3 +1,6 @@
 curl -i -X GET -H "Content-Type:application/json" http://localhost:8084/OmegaRest/webresources/TextsSentence/
 
 curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/some/uri/1","text":"some text"}' http://localhost:8084/OmegaRest/webresources/TextsSentence/text/create
+
+#SEARCH
+curl -i -X GET    -H "Content-Type:application/json"     'http://localhost:8080/OmegaRest/webresources/Search/text?keyword=prova' 

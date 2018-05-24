@@ -17,8 +17,10 @@ import it.cnr.ilc.lc.omega.rest.servicemodel.AnnotationUri;
 import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
 import it.cnr.ilc.lc.omega.rest.servicemodel.TextDTO;
 import it.cnr.ilc.lc.omega.rest.servicemodel.TextUri;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
+import java.util.logging.Level;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -72,19 +74,19 @@ public class TextsResource {
         Response.ResponseBuilder rb = Response.created(context.getAbsolutePath());
         Text t = null;
         URI uri = null;
-        
+
         try {
-            
+
             uri = URI.create(text.uri);
             if (null != text.text) {
                 t = Text.of(text.text, uri);
             } else {
-                t = Text.of(uri);
+                t = Text.of(uri.toURL());
             }
             t.save();
 
         } catch (NullPointerException npe) {
-            log.error("createText: " , npe);
+            log.error("createText: ", npe);
             rb.entity(new ServiceResult("1", "Error, " + ExceptionUtils.getRootCauseMessage(npe)));
             return rb.build();
 
@@ -101,6 +103,9 @@ public class TextsResource {
         } catch (IllegalArgumentException iae) {
             log.error("createText: " + iae.getMessage());
             rb.entity(new ServiceResult("4", "Invalid URI, " + iae.getLocalizedMessage()));
+        } catch (MalformedURLException mue) {
+            log.error("createText: " + mue.getMessage());
+            rb.entity(new ServiceResult("5", "Invalid URL, " + mue.getLocalizedMessage()));
         }
         log.info("createText: ok!");
 
