@@ -21,14 +21,14 @@ import org.apache.logging.log4j.Logger;
  * @author simone
  */
 @Path("/Search")
-public class Search {
+public class SearchRest {
 
-    private static final Logger log = LogManager.getLogger(Search.class);
+    private static final Logger log = LogManager.getLogger(SearchRest.class);
 
   //  @Part
  //   private static SearchManager sm;
     
-    public Search() {
+    public SearchRest() {
     }
     
 

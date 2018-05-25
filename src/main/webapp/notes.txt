@@ -4,3 +4,6 @@ curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/some/uri/1","tex
 
 #SEARCH
 curl -i -X GET    -H "Content-Type:application/json"     'http://localhost:8080/OmegaRest/webresources/Search/text?keyword=prova' 
+
+#BASE ANNOTATION CREATE
+curl -i -X POST    -H "Content-Type:application/json"    -d '{}'  'http://localhost:8080/OmegaRest/webresources/annotation/baseannotationtext/create'

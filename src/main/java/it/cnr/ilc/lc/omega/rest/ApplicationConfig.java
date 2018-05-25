@@ -37,6 +37,12 @@ public class ApplicationConfig extends Application {
 //        return properties;
 //    }
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(it.cnr.ilc.lc.omega.rest.TextsResource.class);
+        resources.add(it.cnr.ilc.lc.omega.rest.WorksResource.class);
+        resources.add(it.cnr.ilc.lc.omega.rest.annotation.AnnotationsResource.class);
+        resources.add(it.cnr.ilc.lc.omega.rest.query.SearchRest.class);
+        resources.add(it.cnr.ilc.lc.omega.rest.virtualdatasystem.RepositoryResource.class);
+        resources.add(provider.MyJacksonJsonProvider.class);
     }
 
 }
