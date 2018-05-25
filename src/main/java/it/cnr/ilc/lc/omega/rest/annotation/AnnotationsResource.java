@@ -8,8 +8,12 @@ package it.cnr.ilc.lc.omega.rest.annotation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.ilc.lc.omega.adt.annotation.BaseAnnotationText;
+import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.ADTAbstractAnnotation;
+import it.cnr.ilc.lc.omega.core.datatype.Text;
 import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
+import java.net.URI;
+import java.util.logging.Level;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -50,23 +54,32 @@ public class AnnotationsResource {
         Response.ResponseBuilder rb = Response.created(context.getAbsolutePath());
 
         log.info("type is " + type);
+        log.info("annDTO uri is " + annDTO.uri);
 
         try {
             
-            BaseAnnotationText bat = ADTAbstractAnnotation.of(BaseAnnotationText.class);
+            
             //final ObjectMapper mapper = mapperResolver.getContext(Object.class);
             ObjectMapper mapper = new ObjectMapper();
             BaseAnnotationDTO badto = mapper.treeToValue(annDTO.annotationData, BaseAnnotationDTO.class);
-
+            
+            BaseAnnotationText bat = ADTAbstractAnnotation.of(BaseAnnotationText.class, badto.text, annDTO.uri);
+            bat.addLocus(Text.load(badto.textUri), badto.start, badto.end);
+            
+            //bat.save(); //FIXME salvare l'annotazione nel DB;
+            
             rb.entity(new ServiceResult("0", "BaseAnnotation " + bat.toString() + ", annDTO=(" + annDTO + ") badto=(" + badto+")"));
 
             return rb.build();
             
         } catch (JsonProcessingException ex) {
             log.error(ex);
+            // FIXME adding return rb.build
+        } catch (ManagerAction.ActionException exAction) {
+           log.error(exAction);
         }
         
-        return null;
+        return null; // FIXME
 
     }
 
