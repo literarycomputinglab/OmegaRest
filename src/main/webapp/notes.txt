@@ -6,4 +6,4 @@ curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/some/uri/1","tex
 curl -i -X GET    -H "Content-Type:application/json"     'http://localhost:8080/OmegaRest/webresources/Search/text?keyword=prova' 
 
 #BASE ANNOTATION CREATE
-curl -i -X POST    -H "Content-Type:application/json"    -d '{}'  'http://localhost:8080/OmegaRest/webresources/annotation/baseannotationtext/create'
+curl -i -X POST    -H "Content-Type:application/json"    -d '{"uri":"/uri/baseannotation/001","annotationData":{"text":"testo della annotazine","textUri":"//source/text/000","start":"1","end":"5"}}'  'http://localhost:8080/OmegaRest/webresources/annotation/baseannotationtext/create'
