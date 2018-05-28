@@ -57,13 +57,18 @@ public class AnnotationsResource {
         log.info("annDTO uri is " + annDTO.uri);
 
         try {
-            
+            String annotationType = "it.cnr.ilc.lc.omega.adt.annotation."+type;
+            Class<T> annotationTypeClass = Class.forName(annotationType);
+            String annotationDTO = "it.cnr.ilc.lc.omega.rest.annotation."+type+"DTO";
+            Class<E> annotationDTOClass = Class.forName(annotationDTO);
+
             
             //final ObjectMapper mapper = mapperResolver.getContext(Object.class);
             ObjectMapper mapper = new ObjectMapper();
-            BaseAnnotationDTO badto = mapper.treeToValue(annDTO.annotationData, BaseAnnotationDTO.class);
-            
-            BaseAnnotationText bat = ADTAbstractAnnotation.of(BaseAnnotationText.class, badto.text, annDTO.uri);
+            (E) badto = mapper.treeToValue(annDTO.annotationData, annotationDTOClass);
+
+            (T) bat = ADTAbstractAnnotation.of(annotationTypeClass, badto.text, annDTO.uri);
+
             bat.addLocus(Text.load(badto.textUri), badto.start, badto.end);
             
             //bat.save(); //FIXME salvare l'annotazione nel DB;
