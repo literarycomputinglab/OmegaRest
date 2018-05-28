@@ -8,11 +8,15 @@ package it.cnr.ilc.lc.omega.rest.annotation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.ilc.lc.omega.adt.annotation.BaseAnnotationText;
+import it.cnr.ilc.lc.omega.adt.annotation.dto.Couple;
 import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.ADTAbstractAnnotation;
+import it.cnr.ilc.lc.omega.core.datatype.ADTAnnotation;
 import it.cnr.ilc.lc.omega.core.datatype.Text;
 import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -35,12 +39,17 @@ public class AnnotationsResource {
 
     private static final Logger log = LogManager.getLogger(AnnotationsResource.class);
 
+    private final Map<String, Couple<Class<?>, Class<?>>> typeClassMap;
+
+    {
+        typeClassMap = new HashMap<>();
+        typeClassMap.put("BaseAnnotationText", new Couple<>(BaseAnnotationText.class, BaseAnnotationTextDTO.class));
+    }
     @Context
     private UriInfo context;
 
-   // @Context
+    // @Context
     //private ContextResolver<ObjectMapper> mapperResolver;
-
     public AnnotationsResource() {
     }
 
@@ -57,33 +66,30 @@ public class AnnotationsResource {
         log.info("annDTO uri is " + annDTO.uri);
 
         try {
-            String annotationType = "it.cnr.ilc.lc.omega.adt.annotation."+type;
-            Class<T> annotationTypeClass = Class.forName(annotationType);
-            String annotationDTO = "it.cnr.ilc.lc.omega.rest.annotation."+type+"DTO";
-            Class<E> annotationDTOClass = Class.forName(annotationDTO);
 
-            
+            Class annotationTypeClass = typeClassMap.get("BaseAnnotationText").getFirst();
+
+            Class annotationDTOClass = typeClassMap.get("BaseAnnotationText").getSecond();
+
             //final ObjectMapper mapper = mapperResolver.getContext(Object.class);
             ObjectMapper mapper = new ObjectMapper();
-            (E) badto = mapper.treeToValue(annDTO.annotationData, annotationDTOClass);
+            Object badto = mapper.treeToValue(annDTO.annotationData, annotationDTOClass);
 
-            (T) bat = ADTAbstractAnnotation.of(annotationTypeClass, badto.text, annDTO.uri);
+            ParameterHandler ph = new ParameterHandler(badto, typeClassMap.get(type));
 
-            bat.addLocus(Text.load(badto.textUri), badto.start, badto.end);
+            ADTAnnotation ann = ADTAbstractAnnotation.of(annotationTypeClass, annDTO.uri, ph.getBuildAnnotationParameter());
+
+            ann = ph.populateAnnotation(ann);
+
             
             //bat.save(); //FIXME salvare l'annotazione nel DB;
-            
-            rb.entity(new ServiceResult("0", "BaseAnnotation " + bat.toString() + ", annDTO=(" + annDTO + ") badto=(" + badto+")"));
-
+            rb.entity(new ServiceResult("0", "BaseAnnotation " + ann.toString() + ", annDTO=(" + annDTO + ") badto=(" + badto + ")"));
             return rb.build();
-            
+
         } catch (JsonProcessingException ex) {
             log.error(ex);
-            // FIXME adding return rb.build
-        } catch (ManagerAction.ActionException exAction) {
-           log.error(exAction);
         }
-        
+
         return null; // FIXME
 
     }

@@ -11,7 +11,7 @@ import java.net.URI;
  *
  * @author simone
  */
-public class BaseAnnotationDTO {
+public class BaseAnnotationTextDTO {
     
     public String text;
     public URI textUri;
