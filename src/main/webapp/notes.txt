@@ -7,3 +7,6 @@ curl -i -X GET    -H "Content-Type:application/json"     'http://localhost:8080/
 
 #BASE ANNOTATION CREATE
 curl -i -X POST    -H "Content-Type:application/json"    -d '{"uri":"/uri/baseannotation/001","annotationData":{"text":"testo della annotazione","textUri":"//source/text/000","start":"1","end":"5"}}'  'http://localhost:8080/OmegaRest/webresources/annotation/BaseAnnotationText/create'
+
+#Abbreviation
+curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/uri/abbreviation/001","annotationData":{"expansion":"abbreviazione sciolta","textUri":"//source/text/000","start":"0","end":"5", "fragment":"Abbr."}}'  'http://localhost:8080/OmegaRest/webresources/annotation/Abbreviation/create'
