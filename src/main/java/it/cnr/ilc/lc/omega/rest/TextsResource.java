@@ -11,23 +11,19 @@ package it.cnr.ilc.lc.omega.rest;
  */
 import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.Text;
-import it.cnr.ilc.lc.omega.entity.Annotation;
 import it.cnr.ilc.lc.omega.exception.InvalidURIException;
-import it.cnr.ilc.lc.omega.rest.servicemodel.AnnotationUri;
 import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
 import it.cnr.ilc.lc.omega.rest.servicemodel.TextDTO;
 import it.cnr.ilc.lc.omega.rest.servicemodel.TextUri;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
-import java.util.logging.Level;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -112,10 +108,10 @@ public class TextsResource {
         return rb.entity(new ServiceResult()).build();
     }
 
-    @Path("text")
+    @Path("text{uri: [\\w/]+}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Text getTextByUri(@QueryParam("uri") String uri) {
+    public Text getTextByUri(@PathParam("uri") String uri) {
         log.info("getTextByUri(" + uri + ")");
         try {
 
@@ -126,33 +122,33 @@ public class TextsResource {
         return null;
     }
 
-    @Path("annotations")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<AnnotationUri> getAnnotations() {
-
-        log.info("getAnnotations()");
-        try {
-            return AnnotationUri.toAnnotationUri(Text.loadAllAnnotations());
-        } catch (ManagerAction.ActionException ex) {
-            log.fatal(ex);
-        }
-        return null;
-    }
-
-    @Path("annotations/annotation")
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Annotation getAnnotation(@QueryParam("uri") String uri) {
-
-        log.info("getAnnotation (" + uri + ")");
-        try {
-            return Text.loadAnnotation(URI.create(uri));
-        } catch (ManagerAction.ActionException ex) {
-            log.fatal(ex);
-        }
-        return null;
-    }
+//    @Path("annotations")
+//    @GET
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<AnnotationUri> getAnnotations() {
+//
+//        log.info("getAnnotations()");
+//        try {
+//            return AnnotationUri.toAnnotationUri(Text.loadAllAnnotations());
+//        } catch (ManagerAction.ActionException ex) {
+//            log.fatal(ex);
+//        }
+//        return null;
+//    }
+//
+//    @Path("annotations/annotation")
+//    @GET
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Annotation getAnnotation(@QueryParam("uri") String uri) {
+//
+//        log.info("getAnnotation (" + uri + ")");
+//        try {
+//            return Text.loadAnnotation(URI.create(uri));
+//        } catch (ManagerAction.ActionException ex) {
+//            log.fatal(ex);
+//        }
+//        return null;
+//    }
 //    @POST
 //    @Consumes(MediaType.APPLICATION_JSON)
 //    public void postJson(String name) {

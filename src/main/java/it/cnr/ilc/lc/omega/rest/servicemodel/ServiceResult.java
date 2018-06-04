@@ -6,6 +6,7 @@
 package it.cnr.ilc.lc.omega.rest.servicemodel;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -14,17 +15,25 @@ import java.io.Serializable;
 public class ServiceResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private String codeError = "0";
     private String body = "no errors";
+    private List<?> result = null;
 
     public ServiceResult() {
     }
 
     public ServiceResult(String _codeError, String _bodyError) {
 
+        this(_codeError, _bodyError, null);
+    }
+
+    public ServiceResult(String _codeError, String _bodyError, List<?> _result) {
+
         codeError = _codeError;
         body = _bodyError;
+        result = _result;
+
     }
 
     public String getCodeError() {
@@ -41,6 +50,14 @@ public class ServiceResult implements Serializable {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public List<?> getResult() {
+        return result;
+    }
+
+    public void setResult(List<?> result) {
+        this.result = result;
     }
 
 }

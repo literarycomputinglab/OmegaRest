@@ -45,10 +45,8 @@ public class MyJacksonJsonProvider implements ContextResolver<ObjectMapper> {
         
         MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
-        
 //        MAPPER.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 //        MAPPER.disable(MapperFeature.USE_GETTERS_AS_SETTERS);
-//        
         //MAPPER.disable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
     }

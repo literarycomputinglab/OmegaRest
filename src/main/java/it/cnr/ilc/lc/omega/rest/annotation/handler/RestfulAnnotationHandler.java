@@ -25,6 +25,7 @@ public interface RestfulAnnotationHandler {
 
     public void init(JsonNode annDTO);
 
-    public Class getAnnotationTypeClass();
+    public Class getAnnotationTypeClass(); //TODO tipare il return in Class<?>
     
+    public Class getAnnotationDataTypeClass();
 }

@@ -11,11 +11,20 @@ import java.net.URI;
  *
  * @author simone
  */
-public class BaseAnnotationTextDTO {
-    
+public class BaseAnnotationTextDTO implements RestfulDTO {
+
     public String text;
     public URI textUri;
-    public int start;
-    public int end;
-    
+    public Integer start;
+    public Integer end;
+
+    @Override
+    public boolean check() {
+
+        boolean resp = true;
+        if ((textUri == null) || (start == null) || (end == null) || (text == null)) {
+            resp = false;
+        }
+        return resp;
+    }
 }

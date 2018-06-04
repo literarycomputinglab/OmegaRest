@@ -5,8 +5,23 @@ curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/some/uri/1","tex
 #SEARCH
 curl -i -X GET    -H "Content-Type:application/json"     'http://localhost:8080/OmegaRest/webresources/Search/text?keyword=prova' 
 
-#BASE ANNOTATION CREATE
+#CREATE Base Annotation
 curl -i -X POST    -H "Content-Type:application/json"    -d '{"uri":"/uri/baseannotation/001","annotationData":{"text":"testo della annotazione","textUri":"//source/text/000","start":"1","end":"5"}}'  'http://localhost:8080/OmegaRest/webresources/annotation/BaseAnnotationText/create'
 
-#Abbreviation
+#CREATE Abbreviation
 curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/uri/abbreviation/001","annotationData":{"expansion":"abbreviazione sciolta","textUri":"//source/text/000","start":"0","end":"5", "fragment":"Abbr."}}'  'http://localhost:8080/OmegaRest/webresources/annotation/Abbreviation/create'
+
+#SEARCH Content by Keyword
+curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/content?keyword=prova' 
+
+#SEARCH Annotation by Keyword
+curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation?keyword=2018'
+
+#SEARCH Annotation by URI
+curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation/work/italia/governo/2018'
+
+#SEARCH Annotation by Annotation Type, Query and Field
+curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation/BaseAnnotation?query="sul testo"&field="text"'
+
+#SEARCH Abbreviation by query and field
+curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation/Abbreviation?query=%22testo%20della%22&field=text'

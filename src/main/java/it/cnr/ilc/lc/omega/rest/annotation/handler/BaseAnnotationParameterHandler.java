@@ -8,11 +8,15 @@ package it.cnr.ilc.lc.omega.rest.annotation.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.cnr.ilc.lc.omega.adt.annotation.BaseAnnotationText;
+import it.cnr.ilc.lc.omega.annotation.BaseAnnotation;
 import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.ADTAnnotation;
 import it.cnr.ilc.lc.omega.core.datatype.Text;
 import it.cnr.ilc.lc.omega.rest.annotation.BaseAnnotationTextDTO;
+import javax.ws.rs.ProcessingException;
 import org.apache.logging.log4j.LogManager;
 import sirius.kernel.di.std.Register;
 
@@ -29,16 +33,31 @@ public class BaseAnnotationParameterHandler implements RestfulAnnotationHandler 
 
     private final String type = "BaseAnnotationText";
     private final Class<BaseAnnotationText> typeClass = BaseAnnotationText.class;
+    private final Class<BaseAnnotation> dataTypeClass = BaseAnnotation.class;
 
-    public    BaseAnnotationParameterHandler() {
+    public BaseAnnotationParameterHandler() {
 
     }
 
     @Override
     public void init(JsonNode jsonAnnotationDTO) {
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            dataAnnotationDTO = mapper.treeToValue(jsonAnnotationDTO, BaseAnnotationTextDTO.class);
+            if (jsonAnnotationDTO != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                dataAnnotationDTO = mapper.treeToValue(jsonAnnotationDTO, BaseAnnotationTextDTO.class);
+                if (!(jsonAnnotationDTO instanceof NullNode)) {
+                    if (dataAnnotationDTO != null) {
+                        if (!dataAnnotationDTO.check()) {
+                            throw new IllegalArgumentException("ERR: some argments are null" + dataAnnotationDTO.toString());
+                        }
+                    } else {
+                        throw new IllegalArgumentException("ERR: unable to map the JsonObject on to BaseAnnotationDTO: " + jsonAnnotationDTO.asText());
+                    }
+                }
+            } else {
+                throw new IllegalArgumentException("ERR: jsonAnnotationDTO is null!");
+            }
+
         } catch (JsonProcessingException ex) {
             log.error(ex);
         }
@@ -48,13 +67,6 @@ public class BaseAnnotationParameterHandler implements RestfulAnnotationHandler 
     public String getType() {
         return type;
     }
-
-    @Override
-    public Class<BaseAnnotationText> getAnnotationTypeClass() {
-        return typeClass;
-    }
-    
-    
 
     @Override
     public Object[] getBuildAnnotationParameter() {
@@ -86,8 +98,19 @@ public class BaseAnnotationParameterHandler implements RestfulAnnotationHandler 
             log.info("BaseAnnotationText saved");
         } catch (ManagerAction.ActionException ex) {
             log.error(ex);
+            throw new ProcessingException("Error saving the annotation ", ex.getCause());
         }
         return ann;
+    }
+
+    @Override
+    public Class<BaseAnnotationText> getAnnotationTypeClass() {
+        return typeClass;
+    }
+
+    @Override
+    public Class<BaseAnnotation> getAnnotationDataTypeClass() {
+        return dataTypeClass;
     }
 
 }

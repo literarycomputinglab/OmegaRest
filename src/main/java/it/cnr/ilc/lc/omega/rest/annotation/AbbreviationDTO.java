@@ -6,17 +6,38 @@
 package it.cnr.ilc.lc.omega.rest.annotation;
 
 import java.net.URI;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author simone
  */
-public class AbbreviationDTO {
+public class AbbreviationDTO implements RestfulDTO {
+
+    private static Logger log = LogManager.getLogger(AbbreviationDTO.class);
     
     public String expansion;
     public URI textUri;
-    public int start;
-    public int end;
+    public Integer start;
+    public Integer end;
     public String fragment;
+
+    @Override
+    public boolean check() {
+
+        boolean resp = true;
+        if ((textUri == null) ||  (start == null) ||  (end == null) ||  (fragment == null)){
+            resp = false;
+        }         
+        return resp;
+    }
+
+    @Override
+    public String toString() {
+        return "(" +expansion + ") (" + textUri + ") (" + start + ") (" + end + ") (" + fragment +")";
+    }
     
+    
+
 }
