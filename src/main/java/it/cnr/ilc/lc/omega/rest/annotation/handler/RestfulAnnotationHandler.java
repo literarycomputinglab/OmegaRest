@@ -23,7 +23,7 @@ public interface RestfulAnnotationHandler {
 
     public ADTAnnotation saveAnnotation(ADTAnnotation ann);
 
-    public void init(JsonNode annDTO);
+    public void init(JsonNode jsonAnnotationDTO);
 
     public Class getAnnotationTypeClass(); //TODO tipare il return in Class<?>
     

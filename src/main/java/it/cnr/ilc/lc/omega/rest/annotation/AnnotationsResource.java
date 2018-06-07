@@ -78,10 +78,14 @@ public class AnnotationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createAnnotation(@PathParam("annotationType") String type, AnnotationDTO annDTO) {
 
-        Response.ResponseBuilder rb = Response.created(context.getAbsolutePath());
+        Response.ResponseBuilder rb;
 
         if (!annDTO.check()) {
             log.error("Invalid DTO " + annDTO.toString());
+            rb = Response.serverError()
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                    .allow("OPTIONS");
             rb.entity(new ServiceResult("-1", "ERR: One or more parameters are null, parameter=(" + annDTO.toString() + ")"));
         } else {
 
@@ -93,13 +97,25 @@ public class AnnotationsResource {
                         annDTO.uri, restfullAnnotationHandler.getBuildAnnotationParameter());
                 restfullAnnotationHandler.populateAnnotation(ann);
                 restfullAnnotationHandler.saveAnnotation(ann);
+                rb = Response.created(context.getAbsolutePath())
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                        .allow("OPTIONS");
                 rb.entity(new ServiceResult("0", "Created annotation of type " + type + " with uri " + annDTO.uri));
             } catch (IllegalArgumentException iae) {
                 log.error(iae.getLocalizedMessage());
+                rb = Response.serverError()
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                        .allow("OPTIONS");
                 rb.entity(new ServiceResult("-2", "ERR: One or more parameters are null, parameter=(" + annDTO.annotationData.toString() + ")"));
 
             } catch (ProcessingException pe) {
                 log.error(pe.getLocalizedMessage());
+                rb = Response.serverError()
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                        .allow("OPTIONS");
                 rb.entity(new ServiceResult("-3", "ERR: Saving annotation, cause=(" + pe.getCause().getMessage() + "), parameter=(" + annDTO.toString() + ")"));
 
             }

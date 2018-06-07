@@ -11,6 +11,9 @@ curl -i -X POST    -H "Content-Type:application/json"    -d '{"uri":"/uri/basean
 #CREATE Abbreviation
 curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/uri/abbreviation/001","annotationData":{"expansion":"abbreviazione sciolta","textUri":"//source/text/000","start":"0","end":"5", "fragment":"Abbr."}}'  'http://localhost:8080/OmegaRest/webresources/annotation/Abbreviation/create'
 
+#CREATE LexoTerm Annotation
+curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/uri/lexoterm/002","annotationData":{"note":"testo della annotazione di tipo lexoterm","textUri":"http://claviusontheweb.it:8080/exist/rest//db/clavius/documents/147/147.txt","start":"18","end":"30", "fragment":"Christophoro", "leftTermContext":"Botvitus Nericius Christophoro", "rightTermContext":"Christophoro Clavio Salutem", "senseUri":"/uri/sense/001" }}'  'http://localhost:8080/OmegaRest/webresources/annotation/LexoTerm/create'
+
 #SEARCH Content by Keyword
 curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/content?keyword=prova' 
 
@@ -24,4 +27,7 @@ curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRe
 curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation/BaseAnnotation?query="sul testo"&field="text"'
 
 #SEARCH Abbreviation by query and field
-curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation/Abbreviation?query=%22testo%20della%22&field=text'
+curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation/Abbreviation?query=sciolta'
+
+#SEARCH LexoTerm by Type, Query and Field
+curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation/LexoTerm?query="Cristophoro"'

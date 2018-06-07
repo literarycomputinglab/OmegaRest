@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.cnr.ilc.lc.omega.adt.annotation.BaseAnnotationText;
 import it.cnr.ilc.lc.omega.annotation.BaseAnnotation;
 import it.cnr.ilc.lc.omega.core.ManagerAction;
