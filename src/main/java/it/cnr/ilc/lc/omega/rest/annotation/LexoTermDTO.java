@@ -7,8 +7,6 @@ package it.cnr.ilc.lc.omega.rest.annotation;
 
 import java.lang.reflect.Field;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.logging.log4j.LogManager;
 
 /**

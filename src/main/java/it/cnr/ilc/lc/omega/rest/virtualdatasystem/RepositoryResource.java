@@ -19,12 +19,11 @@ import it.cnr.ilc.lc.omega.resourcesystem.dto.RSCParent;
 import it.cnr.ilc.lc.omega.resourcesystem.dto.RSCType;
 import it.cnr.ilc.lc.omega.rest.servicemodel.RSComponentDTO;
 import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
-import it.cnr.ilc.lc.omega.rest.servicemodel.WorkDTO;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.net.URI;
-import java.util.logging.Level;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -190,6 +189,42 @@ public class RepositoryResource {
         return rb.entity(new ServiceResult()).build();
     }
 
+    @Path("/{type:collection|resource}/delete{uri: [\\w/]+}")
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeFileSystemComponent(@PathParam("type") String type, @PathParam("uri") String aUri) {
+        log.info("Request of remove a " + type + " identified by uri=(" + aUri + ")");
+
+        Response.ResponseBuilder rb = Response.status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                .allow("OPTIONS");
+        URI uri = null;
+        try {        //log.info("Request of remove a colelction identified by uri=(" + aUri + ")");
+
+            uri = URI.create(aUri);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getLocalizedMessage());
+            rb = rb.status(Response.Status.BAD_REQUEST);
+            rb.entity(new ServiceResult("2", "Error on URI, " + ExceptionUtils.getRootCauseMessage(e)));
+            return rb.build();
+        }
+
+        ResourceSystemComponent root = getResourceSystemComponent("/collection/root2/col000");
+        ResourceSystemComponent toBeRemoved = root.getChild(uri);
+        toBeRemoved = root.remove(toBeRemoved);
+        if (null == toBeRemoved) {
+            //rimosso ok
+            rb.entity(new ServiceResult("0", type + " identified by uri=(" + aUri + ") has been removed"));
+        } else {
+            //non rimosso
+            rb.status(Response.Status.INTERNAL_SERVER_ERROR).
+                    entity(new ServiceResult("1", "Error removing "+type+" idenfied by uri=(" + aUri + ")"));
+        }
+        return rb.build();
+    }
+
     private ResourceSystemComponent getRSCCollection(String aUri) throws VirtualResourceSystemException {
 
         log.info(String.format("trying to get a Collection referred by URI %s", aUri));
@@ -209,14 +244,14 @@ public class RepositoryResource {
         return rsc;
     }
 
-    private CatalogItem load (URI catalogItemUri){
-        
+    private CatalogItem load(URI catalogItemUri) {
+
         try {
-            return Work.load(catalogItemUri);
+            return Work.load(catalogItemUri); //FIXME: generalizzare: si può linkare qualcsiasi CatalogItem (Es. DublinCode)
         } catch (ManagerAction.ActionException ex) {
             log.error(ex);
         }
         return null;
     }
-    
+
 }

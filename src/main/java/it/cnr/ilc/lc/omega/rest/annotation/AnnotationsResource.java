@@ -5,6 +5,8 @@
  */
 package it.cnr.ilc.lc.omega.rest.annotation;
 
+import com.fasterxml.jackson.databind.node.NullNode;
+import it.cnr.ilc.lc.omega.adt.annotation.BaseAnnotationText;
 import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.ADTAbstractAnnotation;
 import it.cnr.ilc.lc.omega.core.datatype.ADTAnnotation;
@@ -16,7 +18,9 @@ import it.cnr.ilc.lc.omega.rest.servicemodel.ServiceResult;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -27,6 +31,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sirius.kernel.di.std.Part;
@@ -124,4 +129,51 @@ public class AnnotationsResource {
 
     }
 
+    @Path("/{type: \\w+}/delete{uri: [\\w/]+}")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeAnnotation(@PathParam("type") String annotationType, @PathParam("uri") String aUri) {
+
+        log.info("DELETE request for Annotation type=(" + annotationType + "), uri=(" + aUri + ")");
+        Response.ResponseBuilder rb = Response.status(Response.Status.OK)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                .allow("OPTIONS");
+        URI uri = null;
+        try {        //log.info("Request of remove a colelction identified by uri=(" + aUri + ")");
+
+            uri = URI.create(aUri);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            log.error(e.getLocalizedMessage());
+            rb = rb.status(Response.Status.BAD_REQUEST);
+            rb.entity(new ServiceResult("2", "Error on URI, " + ExceptionUtils.getRootCauseMessage(e)));
+            log.error("Error creating URI for " + annotationType + " idenfied by uri=(" + aUri + ")");
+            return rb.build();
+        }
+
+        ADTAnnotation toBeRemoved = null;
+        try {
+            RestfulAnnotationHandler restfullAnnotationHandler = factoryHandler.build(annotationType, NullNode.getInstance());
+            toBeRemoved = ADTAbstractAnnotation.load(uri, restfullAnnotationHandler.getAnnotationTypeClass());
+            log.info(toBeRemoved);
+            toBeRemoved = ADTAbstractAnnotation.delete(toBeRemoved);
+        } catch (IllegalArgumentException | ManagerAction.ActionException e) {
+            log.info(e);
+        }
+
+        if (null == toBeRemoved) {
+            //rimosso ok
+            rb.entity(new ServiceResult("0", annotationType + " identified by uri=(" + aUri + ") has been removed"));
+            log.info(annotationType + " identified by uri=(" + aUri + ") has been removed");
+
+        } else {
+            //non rimosso
+            rb.status(Response.Status.INTERNAL_SERVER_ERROR).
+                    entity(new ServiceResult("1", "Error removing " + annotationType + " idenfied by uri=(" + aUri + ")"));
+            log.error("Error removing " + annotationType + " idenfied by uri=(" + aUri + ")");
+
+        }
+        return rb.build();
+
+    }
 }

@@ -6,7 +6,7 @@ curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/some/uri/1","tex
 curl -i -X GET    -H "Content-Type:application/json"     'http://localhost:8080/OmegaRest/webresources/Search/text?keyword=prova' 
 
 #CREATE Base Annotation
-curl -i -X POST    -H "Content-Type:application/json"    -d '{"uri":"/uri/baseannotation/001","annotationData":{"text":"testo della annotazione","textUri":"//source/text/000","start":"1","end":"5"}}'  'http://localhost:8080/OmegaRest/webresources/annotation/BaseAnnotationText/create'
+curl -i -X POST    -H "Content-Type:application/json"    -d '{"uri":"/uri/baseannotation/001","annotationData":{"text":"testo della annotazione","textUri":"//source/text/hillary/curri","start":"1","end":"5"}}'  'http://localhost:8080/OmegaRest/webresources/annotation/BaseAnnotationText/create'
 
 #CREATE Abbreviation
 curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/uri/abbreviation/001","annotationData":{"expansion":"abbreviazione sciolta","textUri":"//source/text/000","start":"0","end":"5", "fragment":"Abbr."}}'  'http://localhost:8080/OmegaRest/webresources/annotation/Abbreviation/create'
@@ -31,3 +31,12 @@ curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRe
 
 #SEARCH LexoTerm by Type, Query and Field
 curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/Search/annotation/LexoTerm?query="Cristophoro"'
+
+#DELETE Collection/Resource del file system
+curl -i -X DELETE -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/demo/repository/collection/delete/collection/root2/resource/res001'
+
+#DELETE Collection/Resource del file system
+curl -i -X DELETE -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/annotation/BaseAnnotationText/delete/uri/baseannotation/001'
+
+#CREATE WORK
+curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/uri/work/001","annotationData":{"authors":{"authors":["bobbe,malle","gigino,oripetente","fava,dilesso"]}},"pubblicationDate":"22-06-2018","title":"un titolo a caso","loci":[{"textUri":"//source/text/rockerduck/curri","start":"1","end":"3", "fragment":"acaso"},{"textUri":"//source/text/donaldduck/curri","start":"5","end":"10", "fragment":"acazo"}] }'  'http://localhost:8080/OmegaRest/webresources/annotation/Work/create'

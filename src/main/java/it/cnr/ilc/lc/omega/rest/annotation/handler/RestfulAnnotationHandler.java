@@ -17,15 +17,16 @@ public interface RestfulAnnotationHandler {
 
     public String getType();
     
+    public Class getAnnotationTypeClass(); //TODO tipare il return in Class<?>
+    
+    public Class getAnnotationDataTypeClass();
+
+    public void init(JsonNode jsonAnnotationDTO);
+
     public Object[] getBuildAnnotationParameter();
 
     public ADTAnnotation populateAnnotation(ADTAnnotation ann);
 
     public ADTAnnotation saveAnnotation(ADTAnnotation ann);
 
-    public void init(JsonNode jsonAnnotationDTO);
-
-    public Class getAnnotationTypeClass(); //TODO tipare il return in Class<?>
-    
-    public Class getAnnotationDataTypeClass();
 }
