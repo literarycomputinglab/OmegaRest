@@ -39,6 +39,7 @@ import sirius.kernel.di.std.Part;
 /**
  *
  * @author simone
+ * @author angelo
  */
 @Path("/annotation")
 public class AnnotationsResource {
@@ -83,7 +84,10 @@ public class AnnotationsResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response createAnnotation(@PathParam("annotationType") String type, AnnotationDTO annDTO) {
 
-        Response.ResponseBuilder rb;
+        Response.ResponseBuilder rb = Response.noContent()
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                .allow("OPTIONS");
 
         if (!annDTO.check()) {
             log.error("Invalid DTO " + annDTO.toString());
@@ -98,15 +102,18 @@ public class AnnotationsResource {
 
             try {
                 RestfulAnnotationHandler restfullAnnotationHandler = factoryHandler.build(type, annDTO.annotationData);
+                
                 ADTAnnotation ann = ADTAbstractAnnotation.of(restfullAnnotationHandler.getAnnotationTypeClass(),
                         annDTO.uri, restfullAnnotationHandler.getBuildAnnotationParameter());
                 restfullAnnotationHandler.populateAnnotation(ann);
                 restfullAnnotationHandler.saveAnnotation(ann);
+                
                 rb = Response.created(context.getAbsolutePath())
                         .header("Access-Control-Allow-Origin", "*")
                         .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
                         .allow("OPTIONS");
                 rb.entity(new ServiceResult("0", "Created annotation of type " + type + " with uri " + annDTO.uri));
+                
             } catch (IllegalArgumentException iae) {
                 log.error(iae.getLocalizedMessage());
                 rb = Response.serverError()

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
-import it.cnr.ilc.lc.omega.adt.annotation.BaseAnnotationText;
 import it.cnr.ilc.lc.omega.adt.annotation.Work;
 import it.cnr.ilc.lc.omega.adt.annotation.dto.DTOValue;
 import it.cnr.ilc.lc.omega.adt.annotation.dto.Loci;
@@ -20,7 +19,6 @@ import it.cnr.ilc.lc.omega.core.datatype.Text;
 import it.cnr.ilc.lc.omega.entity.TextLocus;
 import it.cnr.ilc.lc.omega.rest.annotation.LocusDTO;
 import it.cnr.ilc.lc.omega.rest.annotation.WorkAnnotationDTO;
-import java.util.logging.Level;
 import javax.ws.rs.ProcessingException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,6 +85,7 @@ public class WorkAnnotationParameterHandler implements RestfulAnnotationHandler 
     public Object[] getBuildAnnotationParameter() {
         if (dataAnnotationDTO != null) {
             log.info("Work Annotation DTO: " + dataAnnotationDTO.toString());
+            //FIXME: testare il null di tutti i parametri
             return new Object[]{dataAnnotationDTO.authors,
                 dataAnnotationDTO.pubblicationDate,
                 dataAnnotationDTO.title};
@@ -98,26 +97,32 @@ public class WorkAnnotationParameterHandler implements RestfulAnnotationHandler 
 
     @Override
     public ADTAnnotation populateAnnotation(ADTAnnotation ann) {
-        Work work = (Work) ann;
+        //FIXME: check the annotation
+        if (null != ann) {
+            Work work = (Work) ann;
 
-        try {
-            Loci loci = DTOValue.instantiate(Loci.class);
-            for (LocusDTO locusDto : dataAnnotationDTO.loci) {
-                TextLocus locus;
-                log.info("locusDTO: " + locusDto.toString());
-
-                if (locusDto.start != null && locusDto.end != null) {
-                    locus = Work.createTextLocus(Text.load(locusDto.textUri).getSource(), locusDto.start, locusDto.end);
-                } else {
-                    locus = Work.createTextLocus(Text.load(locusDto.textUri).getSource());
+            try {
+                Loci loci = DTOValue.instantiate(Loci.class);
+                if (dataAnnotationDTO.loci == null) {
+                    throw new InstantiationException("Error while popupating the work annotation");
                 }
-                loci.withValue(locus);
-                log.info("Locus uri=(" + locus.getUri() + ") on Text uri=(" + locus.getSourceUri() + ")");
+                for (LocusDTO locusDto : dataAnnotationDTO.loci) {
+                    TextLocus locus;
+                    log.info("locusDTO: " + locusDto.toString());
+
+                    if (locusDto.start != null && locusDto.end != null) {
+                        locus = Work.createTextLocus(Text.load(locusDto.textUri).getSource(), locusDto.start, locusDto.end);
+                    } else {
+                        locus = Work.createTextLocus(Text.load(locusDto.textUri).getSource());
+                    }
+                    loci.withValue(locus);
+                    log.info("Locus uri=(" + locus.getUri() + ") on Text uri=(" + locus.getSourceUri() + ")");
+                }
+                work.addLoci(loci);
+            } catch (ManagerAction.ActionException | InstantiationException | IllegalAccessException ex) {
+                log.error("Error adding locus to work with uri=(" + work.getURI() + ")", ex.getLocalizedMessage());
+                throw new IllegalStateException("Error adding locus to work with uri=(" + work.getURI() + ")", ex);
             }
-            work.addLoci(loci);
-        } catch (ManagerAction.ActionException | InstantiationException | IllegalAccessException ex) {
-            log.error("Error adding locus to work with uri=(" + work.getURI() + ")", ex.getLocalizedMessage());
-            throw new IllegalStateException("Error adding locus to work with uri=(" + work.getURI() + ")", ex);
         }
 
         return ann;
@@ -125,6 +130,10 @@ public class WorkAnnotationParameterHandler implements RestfulAnnotationHandler 
 
     @Override
     public ADTAnnotation saveAnnotation(ADTAnnotation ann) {
+        //FIXME: check the annotation for null
+        if (null == ann) {
+            throw new IllegalArgumentException("the annotation cannot be saved as it is null");
+        }
 
         Work work = (Work) ann;
         try {

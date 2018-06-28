@@ -12,6 +12,9 @@ import sirius.kernel.di.std.Part;
 /**
  *
  * @author oakgen
+ * @author simone
+ * @author angelo
+ * 
  */
 @WebServlet(urlPatterns = "/core", loadOnStartup = 1)
 public class OmegaServlet extends HttpServlet {

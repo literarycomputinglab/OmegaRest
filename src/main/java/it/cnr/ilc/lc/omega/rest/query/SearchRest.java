@@ -32,6 +32,7 @@ import sirius.kernel.di.std.Part;
 /**
  *
  * @author simone
+ * @author angelo
  */
 @Path("/Search")
 public class SearchRest {
@@ -68,18 +69,26 @@ public class SearchRest {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getContentByKeyword(@QueryParam("keyword") String keyword) {
         log.info("getContentByKeyword(" + keyword + ")");
-        Response.ResponseBuilder rb = Response.created(context.getAbsolutePath());
+        Response.ResponseBuilder rb = Response.status(Response.Status.SERVICE_UNAVAILABLE);
+        rb.header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                .allow("OPTIONS");
         ServiceResult sr;
         try {
             List<Source<TextContent>> lostc = searchManager.searchContentByKeyword(keyword);
-            sr = new ServiceResult("0", "Result of getContentByKeyword(" + keyword + ")", lostc);
+            if (null != lostc) {
+                log.info("result set is not null: size:("+lostc.size()+")", lostc);
+                rb.status(Response.Status.OK);
+                sr = new ServiceResult("0", "Result of getContentByKeyword(" + keyword + ")", lostc);
+            } else {
+                throw new Error("error while searching the string: ("+keyword+")");
+            }
 
-        } catch (ManagerAction.ActionException ex) {
+        } catch (ManagerAction.ActionException | Error ex) {
             log.fatal(ex);
             sr = new ServiceResult("-1", "Error processing getContentByKeyword(" + keyword + ")");
 
-        }
-
+        } 
         return rb.entity(sr).build();
     }
 

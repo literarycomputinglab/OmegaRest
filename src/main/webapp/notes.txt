@@ -1,4 +1,4 @@
-curl -i -X GET -H "Content-Type:application/json" http://localhost:8084/OmegaRest/webresources/TextsSentence/
+curl -i -X GET -H "Content-Type:application/json" http://localhost:8084/OmegaRest/webresources/Texts/
 
 curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/some/uri/1","text":"some text"}' http://localhost:8084/OmegaRest/webresources/TextsSentence/text/create
 
@@ -35,8 +35,8 @@ curl -i -X GET -H "Content-Type:application/json" 'http://localhost:8080/OmegaRe
 #DELETE Collection/Resource del file system
 curl -i -X DELETE -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/demo/repository/collection/delete/collection/root2/resource/res001'
 
-#DELETE Collection/Resource del file system
+#DELETE BaseAnnotationText
 curl -i -X DELETE -H "Content-Type:application/json" 'http://localhost:8080/OmegaRest/webresources/annotation/BaseAnnotationText/delete/uri/baseannotation/001'
 
 #CREATE WORK
-curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/uri/work/001","annotationData":{"authors":{"authors":["bobbe,malle","gigino,oripetente","fava,dilesso"]}},"pubblicationDate":"22-06-2018","title":"un titolo a caso","loci":[{"textUri":"//source/text/rockerduck/curri","start":"1","end":"3", "fragment":"acaso"},{"textUri":"//source/text/donaldduck/curri","start":"5","end":"10", "fragment":"acazo"}] }'  'http://localhost:8080/OmegaRest/webresources/annotation/Work/create'
+curl -i -X POST -H "Content-Type:application/json" -d '{"uri":"/uri/work/001","annotationData":{"authors":{"authors":["bobbe,malle","gigino,oripetente","fava,dilesso"]},"pubblicationDate":"22-06-2018","title":"un titolo a caso","loci":[{"textUri":"//source/text/rockerduck/curri","start":"1","end":"3", "fragment":"acaso"},{"textUri":"//source/text/donaldduck/curri","start":"5","end":"10", "fragment":"acazo"}] }}'  'http://localhost:8080/OmegaRest/webresources/annotation/Work/create'

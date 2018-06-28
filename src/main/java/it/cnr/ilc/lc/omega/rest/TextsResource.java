@@ -8,6 +8,7 @@ package it.cnr.ilc.lc.omega.rest;
 /**
  *
  * @author simone
+ * @author angelo
  */
 import it.cnr.ilc.lc.omega.core.ManagerAction;
 import it.cnr.ilc.lc.omega.core.datatype.Text;
@@ -18,7 +19,9 @@ import it.cnr.ilc.lc.omega.rest.servicemodel.TextUri;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
+import javax.ejb.RemoveException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -33,10 +36,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- *
+ * @author simone
  * @author angelo
  */
-@Path("/TextsSentence")
+@Path("/Texts")
 public class TextsResource {
 
     @Context
@@ -49,15 +52,22 @@ public class TextsResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<TextUri> getAllTextRefs() {
+    public Response getAllTextRefs() {
         log.info("getAllTextRefs()");
+        List<TextUri> ltu;
+        Response.ResponseBuilder rb = Response.status(Response.Status.SERVICE_UNAVAILABLE);
+        rb.header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                .allow("OPTIONS");
         try {
+            ltu = TextUri.toTextUri(Text.loadAll());
+            rb.status(Response.Status.OK);
+            return rb.entity(ltu).build();
 
-            return TextUri.toTextUri(Text.loadAll());
         } catch (ManagerAction.ActionException ex) {
             log.fatal(ex);
         }
-        return null;
+        return rb.build();
     }
 
     @Path("text/create")
@@ -111,15 +121,85 @@ public class TextsResource {
     @Path("text{uri: [\\w/]+}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Text getTextByUri(@PathParam("uri") String uri) {
+    public Response getTextByUri(@PathParam("uri") String uri) {
         log.info("getTextByUri(" + uri + ")");
-        try {
+        Response.ResponseBuilder rb = Response.status(Response.Status.SERVICE_UNAVAILABLE);
+        rb.header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                .allow("OPTIONS");
+        Text text;
 
-            return Text.load(URI.create(uri));
+        try {
+            text = Text.load(URI.create(uri));
+            if (null != text) {
+                rb.status(Response.Status.FOUND);
+                return rb.entity(text).build();
+            } else {
+                throw new Error("error during loading of text with uri: ("+uri+")");
+            }
         } catch (ManagerAction.ActionException ex) {
             log.fatal(ex);
         }
-        return null;
+        return rb.build();
+    }
+
+    @Path("text/delete{uri: [\\w/]+}")
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeText(@PathParam("uri") URI textUri) {
+        log.info("remove Text with uri: (" + textUri + ")");
+        Response.ResponseBuilder rb = Response.status(Response.Status.OK);
+        rb.header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+                .allow("OPTIONS");
+        Text text;
+
+        try {
+
+            if (null == textUri) {
+                throw new IllegalArgumentException("impossible to remove the text as the uri is null");
+            }
+
+            text = Text.load(textUri); // //source/text/hillary/curri
+
+            if (text == null || text.getSource() == null || text.getSource().getContent() == null) {
+                throw new InstantiationException("The text with uri: (" + textUri.toASCIIString() + ") cannot be loaded");
+            }
+
+            text = (Text) Text.delete(text); // FIXME: se ci sono loci entranti bisogna veramente cancellare??
+
+            if (text != null) {
+                throw new Error("The text with the uri: (" + textUri + ") cannot be removed");
+            }
+
+        } catch (ManagerAction.ActionException ex) {
+            log.error(ex.getLocalizedMessage());
+            rb = rb.status(Response.Status.INTERNAL_SERVER_ERROR);
+            rb.entity(new ServiceResult("1", "Error on loading text or deleting text, " + ExceptionUtils.getRootCauseMessage(ex)));
+            log.error("Error delating text!");
+            return rb.build();
+
+        } catch (IllegalArgumentException e) {
+            log.error(e.getLocalizedMessage());
+            rb = rb.status(Response.Status.BAD_REQUEST);
+            rb.entity(new ServiceResult("2", "Error on URI, " + ExceptionUtils.getRootCauseMessage(e)));
+            log.error("Error delating text as URI is null!");
+            return rb.build();
+        } catch (InstantiationException iex) {
+            log.error(iex.getLocalizedMessage());
+            rb = rb.status(Response.Status.INTERNAL_SERVER_ERROR);
+            rb.entity(new ServiceResult("3", "Error on loading text, " + ExceptionUtils.getRootCauseMessage(iex)));
+            log.error("Error delating text as loading failed!");
+            return rb.build();
+        } catch (Error rex) {
+            log.error(rex.getLocalizedMessage());
+            rb = rb.status(Response.Status.INTERNAL_SERVER_ERROR);
+            rb.entity(new ServiceResult("4", "Error on deleting text, " + ExceptionUtils.getRootCauseMessage(rex)));
+            log.error("Error delating text!");
+            return rb.build();
+        }
+
+        return rb.entity(String.format("uri: %s\n\n text: %s\n\n", textUri.toASCIIString(), text.getTextContent())).build();
     }
 
 //    @Path("annotations")
