@@ -19,7 +19,6 @@ import it.cnr.ilc.lc.omega.rest.servicemodel.TextUri;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
-import javax.ejb.RemoveException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -109,9 +108,11 @@ public class TextsResource {
         } catch (IllegalArgumentException iae) {
             log.error("createText: " + iae.getMessage());
             rb.entity(new ServiceResult("4", "Invalid URI, " + iae.getLocalizedMessage()));
+            return rb.build();
         } catch (MalformedURLException mue) {
             log.error("createText: " + mue.getMessage());
             rb.entity(new ServiceResult("5", "Invalid URL, " + mue.getLocalizedMessage()));
+            return rb.build();
         }
         log.info("createText: ok!");
 
@@ -135,7 +136,7 @@ public class TextsResource {
                 rb.status(Response.Status.FOUND);
                 return rb.entity(text).build();
             } else {
-                throw new Error("error during loading of text with uri: ("+uri+")");
+                throw new Error("error during loading of text with uri: (" + uri + ")");
             }
         } catch (ManagerAction.ActionException ex) {
             log.fatal(ex);
